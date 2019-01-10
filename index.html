@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+	<title>学习详情</title>
+	<meta name="keywords" content="学习详情,朗读详情" />
+	<meta name="description" content="优学派学习详情" />
+	<script type="text/javascript">
+        !(function(doc, win) {
+	      var docEl = doc.documentElement,
+	        resizeEvt = 'orientationchange' in window ? 'orientationchange' : 'resize',
+	        recalc = function() {
+	          var clientWidth = docEl.clientWidth;
+	          if (!clientWidth) return;
+	          if (clientWidth < 750) {
+	            docEl.style.fontSize = 100 * (clientWidth / 750) + 'px';
+	          } else {
+	            docEl.style.fontSize = '100px';
+	          }
+	        };
+	      if (!doc.addEventListener) return;
+	      win.addEventListener(resizeEvt, recalc, false);
+	      doc.addEventListener('DOMContentLoaded', recalc, false);
+	    })(document, window);
+    </script>
+	<link rel="stylesheet" type="text/css" href="css/share.css">
+</head>
+<body>
+	<div class="readHeader">
+		完成者：<span>小明</span>
+		<a href="#">修改</a>
+	</div>
+	<div class="readBoxer">
+		<h6>背诵录音</h6>
+		<div class="hide"><audio id="audio" src="http://www.ewingtel.com/1.mp3"></audio></div>
+		<div class="playArea clearfix">
+			<div id="controlBtn" class="controlBtn" onclick="playAudio(this);"></div>
+			<div class="controlBar">
+				<input id="controlSlider" type="range" value="0" min="0" max="100" data-rangeslider>
+			</div>
+			<div id="controlTime" class="controlTime">00:00/00:00</div>
+		</div>
+		<ul class="playArea clearfix">
+			<li>错字：<span class="color-red b">3</span></li>
+			<li>提示次数：<span class="color-red b">5</span></li>
+			<li>用时：<span class="color-red b">00:30</span></li>
+		</ul>
+	</div>
+	<div class="readContent">
+		<h6>背诵内容</h6>
+		<h5>我们的名族小学</h5>
+		<div class="readContentText">
+			<p class="text-indent2">早晨，从山坡上，从坪坝里，从一条条开着绒球花和太阳花的小路上，<span class="color-red">走来了许多小学生有傣族的，有景颇族的，有阿昌族和德昂族的</span>，还有汉族的。大家穿戴不同，语言不同，来到学校，都成了好朋友。那鲜艳的民族服装，把学校打扮得更加绚丽多彩。同学们向在校园里欢唱的小鸟打招呼，向敬爱的老师问好，向高高飘扬的国旗敬礼。</p>
+			<p class="text-indent2">“当，当当！当，当当！”大青树上的钟声敲响了。</p>
+			<p class="text-indent2">上课了，不同民族的小学生，在同一间教室里学习。大家一起读课文，那声音真好听！这时候，窗外十分安静，树枝不摇了，鸟儿不叫了，蝴蝶停在花朵上，好像都在听同学们读课文。最有趣的是跑来了几只猴子。这些山林里的朋友是那样好奇地听着同学们读课文。下课了，大家在大青树下跳孔雀舞、摔跤、做游戏，招引来许多小鸟，连松鼠、山狸也赶来看热闹。</p>
+			<p class="text-indent2">这就是我们的民族小学，一所边疆的民族小学。古老的铜钟，挂在大青树粗壮的枝干上。凤尾竹的影子，在洁白的粉墙上摇晃……</p>
+		</div>
+		<p class="color-gray pt20">完成时间 2018年12月31日 14:00</p>
+		<div class="beizhu"><span class="color-blue">备注:</span> 我背的还不错，快来夸我吧！</div>
+	</div>
+	
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="js/rangeslider.min.js"></script>
+	<script type="text/javascript">
+		var _audio = document.getElementById("audio");
+		var isPlay = false;
+		var $document = $(document);
+	    var selector = '[data-rangeslider]';
+	    var $element = $(selector);
+		
+		$(function(){
+			
+			$document.on('input', 'input[type="range"], ' + selector, function(e) {
+		        showCurrTime(e.target);
+		    });
+		    
+		    $element.rangeslider({
+		        polyfill: false,
+		        onInit: function() {
+		            showCurrTime(this.$element[0]);
+		            if(checkDevice()){
+				   		$(".rangeslider__handle").eq(0).on("touchstart",function(){
+				   			if(!_audio.paused && !_audio.ended && _audio.currentTime!=0){
+				   				_audio.pause();
+				   			}
+				   		});		    	
+				    }else{
+				    	$(".rangeslider__handle").eq(0).on("mouseenter",function(){
+				   			if(!_audio.paused && !_audio.ended && _audio.currentTime!=0){
+				   				_audio.pause();
+				   			}
+				   		});	
+				    }
+		        },
+		        onSlide: function(position, value) {
+		        },
+		        onSlideEnd: function(position, value) {
+		        	var duration = _audio.duration;
+		        	var currTime = value*duration/100;
+		            _audio.currentTime = currTime;
+		            _audio.play();
+		        }
+		    });
+		});
+		
+		_audio.ontimeupdate = function(){
+			isPlay = true;
+			showCurrTime();
+		}
+		_audio.onended = function(){
+			var duration = _audio.duration;
+			$("#controlBtn").removeClass("hover");
+			isPlay = false;
+		}
+		
+		function checkDevice(){
+			var info = navigator.userAgent;
+			if(info.indexOf("iPod")!=-1 || info.indexOf("iPad")!=-1 || info.indexOf("iPhone")!=-1 || info.indexOf("Android")!=-1){
+				return true;
+			}else{
+				return false;
+			}
+		}
+		
+		function showCurrTime(element) {
+			var duration = _audio.duration;
+			if(element){
+		        var currValue = element.value;
+				var currTime = currValue*duration/100;
+			}else{
+				var currTime = _audio.currentTime;
+				var _w = parseInt((currTime/duration)*100);
+	            $element.val(_w).change();
+			}
+	        $("#controlTime").html(getFormatTimer(currTime)+'/'+getFormatTimer(duration));
+	    }
+		
+		function playAudio(e){
+			if(!isPlay){
+				_audio.play();
+				$("#controlBtn").addClass("hover");
+			}else{
+				_audio.pause();
+				isPlay = false;
+				$("#controlBtn").removeClass("hover");
+			}
+		}
+		/*获取格式化的分秒*/
+		function getFormatTimer(timer){
+			if(!timer) return "00:00";
+			var m = parseInt(timer / 60,10);
+			var s = parseInt(timer % 60,10);
+			return (m<10?("0"+m):m)+":"+(s<10?("0"+s):s);
+		};
+	</script>
+</body>
+</html>
